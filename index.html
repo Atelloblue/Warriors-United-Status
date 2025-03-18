@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Bedrock Server Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .status {
+            margin-top: 20px;
+        }
+        .online {
+            color: green;
+        }
+        .offline {
+            color: red;
+        }
+        .info {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #555;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Minecraft Bedrock Server Status</h1>
+    <div class="status">
+        <p id="status">Loading...</p>
+        <p id="players"></p>
+        <p id="version"></p>
+        <p id="motd"></p>
+        <p id="latency"></p>
+        <p id="uptime"></p>
+        <p id="error" class="error"></p>
+    </div>
+
+    <script>
+        fetch("/server-status")
+            .then(response => response.json())
+            .then(data => {
+                const statusElem = document.getElementById("status");
+                const playersElem = document.getElementById("players");
+                const versionElem = document.getElementById("version");
+                const motdElem = document.getElementById("motd");
+                const latencyElem = document.getElementById("latency");
+                const uptimeElem = document.getElementById("uptime");
+                const errorElem = document.getElementById("error");
+
+                if (data.online) {
+                    statusElem.textContent = "Server is Online!";
+                    statusElem.className = "online";
+                    playersElem.textContent = `Players Online: ${data.players} / ${data.maxPlayers}`;
+                    versionElem.textContent = `Version: ${data.version}`;
+                    motdElem.textContent = `MOTD: ${data.motd}`;
+                    latencyElem.textContent = `Latency: ${data.latency} ms`;
+                    uptimeElem.textContent = `Uptime: ${data.uptime ? data.uptime : "N/A"}`;
+                    errorElem.textContent = "";
+                } else {
+                    statusElem.textContent = "Server is Offline!";
+                    statusElem.className = "offline";
+                    playersElem.textContent = "";
+                    versionElem.textContent = "";
+                    motdElem.textContent = "";
+                    latencyElem.textContent = "";
+                    uptimeElem.textContent = "";
+                    errorElem.textContent = `Error: ${data.error || "Unknown error"}`;
+                }
+            })
+            .catch(error => {
+                document.getElementById("status").textContent = "Error loading server status.";
+            });
+    </script>
+</body>
+</html>
